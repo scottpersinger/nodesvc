@@ -1,9 +1,9 @@
 (function() {
-  var formidable, http, jQueryPath, jsdom, open_options, path, phone_user_agent, report_error, router, sys, urlparse, user_agent, utils;
+  var formidable, http, jQueryPath, jsdom, open_options, path, phone_user_agent, port, report_error, router, sys, urlparse, user_agent, utils;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  utils = require('./utils.js');
+  utils = require('./utils');
   http = require('http');
-  router = require('./lib/choreographer.js').router();
+  router = require('./lib/choreographer').router();
   sys = require('sys');
   jsdom = require('jsdom');
   jQueryPath = 'http://code.jquery.com/jquery-1.4.2.min.js';
@@ -126,7 +126,8 @@
       }
     });
   });
-  http.createServer(router).listen(8080);
-  sys.debug("Server started on port 8080.");
+  port = process.argv[2] || 8080;
+  http.createServer(router).listen(port);
+  sys.debug("Server started on port " + port + ".");
   sys.log("Server started.");
 }).call(this);

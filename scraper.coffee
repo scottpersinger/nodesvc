@@ -5,9 +5,9 @@
 # from the page, load jQuery into it, then execute the command script.
 # The result of the script will be converted to JSON and returned.
 
-utils = require('./utils.coffee')
+utils = require('./utils')
 http = require('http')
-router = require('choreographer').router()
+router = require('./lib/choreographer').router()
 sys = require('sys')
 jsdom = require('jsdom');
 jQueryPath = 'http://code.jquery.com/jquery-1.4.2.min.js';
@@ -114,7 +114,7 @@ router.post '/scrape', (req, res) ->
           catch err
             report_error(err, res)
 
-
-http.createServer(router).listen(8080);
-sys.debug("Server started on port 8080.")
+port = process.argv[2] || 8080;
+http.createServer(router).listen(port);
+sys.debug("Server started on port " + port + ".")
 sys.log("Server started.")
