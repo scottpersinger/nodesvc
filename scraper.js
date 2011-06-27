@@ -3,7 +3,7 @@
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   utils = require('./utils.js');
   http = require('http');
-  router = require('choreographer').router();
+  router = require('./lib/choreographer.js').router();
   sys = require('sys');
   jsdom = require('jsdom');
   jQueryPath = 'http://code.jquery.com/jquery-1.4.2.min.js';

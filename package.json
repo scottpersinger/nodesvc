@@ -2,7 +2,6 @@
   "name": "scraper",
   "version": "0.0.1",
   "dependencies": {
-    "choreographer": "0.2.3a", 
     "coffee-script": "1.1.1",
     "formidable": "1.0.2",
     "htmlparser": "1.7.3",
