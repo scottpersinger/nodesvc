@@ -49,6 +49,10 @@ router.get '/log', (req, res) ->
   res.writeHead(200, {'Access-Control-Allow-Origin', '*'});
   res.end()
   
+router.get '/nothing', (req, res) ->
+  res.writeHead(204, {})
+  res.end()
+
 router.get '/', (req, res) ->
   sys.log("Request for home page");
 #  for k, v of req
@@ -56,15 +60,16 @@ router.get '/', (req, res) ->
   
   res.write("<html><body><h1>Scraper Test Page</h1>" + 
   "<div style=\"float:left;width:520px\">" +
-    "<form action=\"/scrape\" target=\"results\" method=\"POST\" enctype=\"multipart/form-data\">" +
+    "<form action=\"/scrape\" target=\"results\" method=\"POST\" onsubmit=\"document.getElementById('results').src = 'about:blank';\" enctype=\"multipart/form-data\">" +
       "url: <input type=\"text\" name=\"url\" value=\"http://google.com\" style=\"width:470px\" /><br />" +
-      "<textarea name=\"body\" style=\"width:500px;height:400px\">return window.jQuery('a').length</textarea><br />" +
+      "<textarea name=\"body\" style=\"width:500px;height:400px\">return $('a').length</textarea><br />" +
+      "User agent: <select name=\"agent\"><option>iPhone</option><option>Desktop</option></select><br />" +
       "<input type=\"submit\" value=\"Run\" />" +
       "</form>" +
     "</div>" +
     "<div style=\"float:left;width:400px\">" +
        "Results<br />" +
-       "<iframe name=\"results\" style=\"width:400px;height:400px\"></iframe>" +
+       "<iframe id=\"results\" name=\"results\" style=\"width:400px;height:400px\"></iframe>" +
     "</div>" +
     "</body></html>")
   res.end();
@@ -81,6 +86,10 @@ router.post '/scrape', (req, res) ->
     origin = req.headers['Origin'] || req.headers['origin'];
     res.setHeader('Access-Control-Allow-Origin', '*');
     
+    theAgent = phone_user_agent;
+    if fields.agent == 'Desktop'
+      theAgent = user_agent
+      
     url = fields.url
     command_script = fields.body
     sys.log("Request to scrape page: #{url}");
@@ -91,7 +100,7 @@ router.post '/scrape', (req, res) ->
       res.write("Error, no url parameter");
       res.end();
     else
-      utils.request {uri: url, headers: {'user-agent': phone_user_agent}}, (err, response, body) =>
+      utils.request {uri: url, headers: {'user-agent': theAgent}}, (err, response, body) =>
         sys.log("page downloaded");
         if !body?
           sys.log("Body is empty, response: " +  + sys.inspect(response));
@@ -108,7 +117,7 @@ router.post '/scrape', (req, res) ->
                 eval("window.myinjecter = function() {#{command_script}}");
                 return_data = window.myinjecter();
                 #sys.log("Result of script is " + sys.inspect(return_data));
-                res.writeHead(200, {'Content-Type': 'application/json'});  
+                res.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});  
                 res.write(JSON.stringify(return_data), "utf8");  
                 res.end();
           catch err

@@ -56,9 +56,13 @@
     });
     return res.end();
   });
+  router.get('/nothing', function(req, res) {
+    res.writeHead(204, {});
+    return res.end();
+  });
   router.get('/', function(req, res) {
     sys.log("Request for home page");
-    res.write("<html><body><h1>Scraper Test Page</h1>" + "<div style=\"float:left;width:520px\">" + "<form action=\"/scrape\" target=\"results\" method=\"POST\" enctype=\"multipart/form-data\">" + "url: <input type=\"text\" name=\"url\" value=\"http://google.com\" style=\"width:470px\" /><br />" + "<textarea name=\"body\" style=\"width:500px;height:400px\">return window.jQuery('a').length</textarea><br />" + "<input type=\"submit\" value=\"Run\" />" + "</form>" + "</div>" + "<div style=\"float:left;width:400px\">" + "Results<br />" + "<iframe name=\"results\" style=\"width:400px;height:400px\"></iframe>" + "</div>" + "</body></html>");
+    res.write("<html><body><h1>Scraper Test Page</h1>" + "<div style=\"float:left;width:520px\">" + "<form action=\"/scrape\" target=\"results\" method=\"POST\" onsubmit=\"document.getElementById('results').src = 'about:blank';\" enctype=\"multipart/form-data\">" + "url: <input type=\"text\" name=\"url\" value=\"http://google.com\" style=\"width:470px\" /><br />" + "<textarea name=\"body\" style=\"width:500px;height:400px\">return $('a').length</textarea><br />" + "User agent: <select name=\"agent\"><option>iPhone</option><option>Desktop</option></select><br />" + "<input type=\"submit\" value=\"Run\" />" + "</form>" + "</div>" + "<div style=\"float:left;width:400px\">" + "Results<br />" + "<iframe id=\"results\" name=\"results\" style=\"width:400px;height:400px\"></iframe>" + "</div>" + "</body></html>");
     return res.end();
   });
   router.post('/scrape', function(req, res) {
@@ -66,7 +70,7 @@
     form = new formidable.IncomingForm();
     sys.log("Parsing form");
     return form.parse(req, function(err, fields, files) {
-      var command_script, origin, url;
+      var command_script, origin, theAgent, url;
       sys.log("Form parsing returned");
       sys.log(sys.inspect({
         fields: fields,
@@ -74,6 +78,10 @@
       }));
       origin = req.headers['Origin'] || req.headers['origin'];
       res.setHeader('Access-Control-Allow-Origin', '*');
+      theAgent = phone_user_agent;
+      if (fields.agent === 'Desktop') {
+        theAgent = user_agent;
+      }
       url = fields.url;
       command_script = fields.body;
       sys.log("Request to scrape page: " + url);
@@ -89,7 +97,7 @@
         return utils.request({
           uri: url,
           headers: {
-            'user-agent': phone_user_agent
+            'user-agent': theAgent
           }
         }, __bind(function(err, response, body) {
           sys.log("page downloaded");
@@ -113,7 +121,7 @@
                 eval("window.myinjecter = function() {" + command_script + "}");
                 return_data = window.myinjecter();
                 res.writeHead(200, {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json; charset=utf-8'
                 });
                 res.write(JSON.stringify(return_data), "utf8");
                 return res.end();
