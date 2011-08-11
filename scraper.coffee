@@ -67,7 +67,7 @@ router.get '/', (req, res) ->
       "<input type=\"submit\" value=\"Run\" />" +
       "</form>" +
       "<br /><h2>Scratchpad</h2><br />" +
-      "<textarea style=\"width:500px\";height:300px\"></textarea>" +
+      "<textarea style=\"width:500px;height:300px\"></textarea>" +
     "</div>" +
     "<div style=\"float:left;width:400px\">" +
        "Results<br />" +
