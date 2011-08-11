@@ -66,6 +66,8 @@ router.get '/', (req, res) ->
       "User agent: <select name=\"agent\"><option>iPhone</option><option>Desktop</option></select><br />" +
       "<input type=\"submit\" value=\"Run\" />" +
       "</form>" +
+      "<br /><h2>Scratchpad</h2><br />" +
+      "<textarea style=\"width:500px\" height=\"300px\"></textarea>" +
     "</div>" +
     "<div style=\"float:left;width:400px\">" +
        "Results<br />" +
@@ -73,7 +75,9 @@ router.get '/', (req, res) ->
     "</div>" +
     "</body></html>")
   res.end();
-  
+
+router.get '/proxy', (req,res) ->
+     
 router.post '/scrape', (req, res) ->  
   form = new formidable.IncomingForm();
     
